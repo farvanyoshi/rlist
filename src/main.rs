@@ -25,20 +25,17 @@ fn main() {
 }
 
 fn list_all(args: Vec<String>) {
-    // Try to read file and place in string list, else stop the program
-    let list: Vec<String> = fs::read_to_string("todo-list.txt")
-        .unwrap()
-        .lines()
-        .map(String::from)
-        .collect();
-
-    // format and print list to console
-    println!("Number of items in list: {}", list.len());
-    for item in list {
-        println!("{}", item);
-    }
-
-    if let Some(flag) = args.get(2) {
-        flags::match_flag(flag, &args[ARG_OFFSET..]);
-    }
+    match fs::read_to_string("todo-list.txt") {
+        Ok(contents) => {
+            let items: Vec<&str> = contents.lines().collect();
+            println!("Number of items in list: {}", items.len());
+            for item in items {
+                println!("{}", item);
+            }
+            if let Some(flag) = args.get(2) {
+                flags::match_flag(flag, &args[ARG_OFFSET..]);
+            }
+        }
+        Err(_) => println!("No to-do list found.")
+    };
 }
