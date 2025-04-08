@@ -1,6 +1,6 @@
 use std::env;
-use std::fs::{self, File, OpenOptions};
-use std::io::Write;
+use std::fs;
+pub mod flags;
 
 // The goal is to write a basic to-do list with a file to store data
 
@@ -20,29 +20,7 @@ fn main() {
             list_all(args);
             return;
         },
-        other => match_flag(other, &args[ARG_OFFSET..]) // first arg is name, second is flag, so the rest will be commands
-    }
-}
-
-fn print_usage() {
-    println!("Usage: rlist [-l] [-a | -c | -r] args...");
-    println!("  -l:   List all items in list before operation.");
-    println!("  -a:   Add args to list.");
-    println!("  -c:   Clear all items from list.");
-    println!("  -r:   Remove args from list.");
-    return;
-}
-
-fn match_flag(flag: &str, args: &[String]) {
-    match flag {
-        "-a" => add_items(args),
-        "-c" => todo!(),
-        "-r" => todo!(),
-        "-h" => print_usage(),
-        _ => {
-            eprintln!("Error: unknown flag. See usage with -h.");
-            return;
-        }
+        other => flags::match_flag(other, &args[ARG_OFFSET..]) // first arg is name, second is flag, so the rest will be commands
     }
 }
 
@@ -61,34 +39,6 @@ fn list_all(args: Vec<String>) {
     }
 
     if let Some(flag) = args.get(2) {
-        match_flag(flag, &args[ARG_OFFSET..]);
-    }
-}
-
-fn add_items(items: &[String]) {
-    // If passed with no further arguments
-    if items.is_empty() {
-        eprintln!("Error: nothing to add.");
-        return;
-    }
-
-    // Open file in append mode, create if doesn't exist
-    let mut list = match OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open("todo-list.txt") {
-            Ok(file) => file,
-            Err(e) => {
-                eprintln!("Error: could not open or create file: {}", e);
-                return;
-            }
-    };
-
-    // Write each element to file, but continue writing if one fails
-    for item in items {
-        if let Err(e) = list.write(format!("{item}\n").as_bytes()) {
-            eprintln!("Error: could not append to file: {}", e);
-        }
-        println!("Item added: {}", item);
+        flags::match_flag(flag, &args[ARG_OFFSET..]);
     }
 }
