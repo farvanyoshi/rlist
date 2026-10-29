@@ -33,7 +33,7 @@ fn list_all(args: Vec<String>) {
                 println!("{}", item);
             }
             if let Some(flag) = args.get(2) {
-                flags::match_flag(flag, &args[ARG_OFFSET..]);
+                flags::match_flag(flag, &args[ARG_OFFSET + 1..]); // skip the flag itself
             }
         }
         Err(_) => println!("No to-do list found.")
